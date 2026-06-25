@@ -7,6 +7,8 @@ async function createPost(formData: FormData) {
 
   const title = formData.get("title");
   const content = formData.get("content");
+  const publishedFlag = formData.get("published");
+  const published = publishedFlag === "true";
 
   if (!title || typeof title !== "string") {
     throw new Error("Title is required");
@@ -16,11 +18,11 @@ async function createPost(formData: FormData) {
     data: {
       title,
       content: typeof content === "string" ? content : null,
-      published: true,
+      published,
     },
   });
 
-  redirect("/post");
+  redirect(published ? "/post" : "/draft");
 }
 
 export default function AddPostPage() {
@@ -50,6 +52,16 @@ export default function AddPostPage() {
           </nav>
         </header>
         <section className="space-y-8 rounded-3xl border border-zinc-200 p-10 dark:border-zinc-800">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">Create a new post or save it as draft</h2>
+            <Link
+              href="/draft"
+              className="rounded-full border border-zinc-200 px-4 py-2 text-sm text-zinc-950 transition hover:border-zinc-300 dark:border-zinc-800 dark:text-zinc-50"
+            >
+              View Drafts
+            </Link>
+          </div>
+
           <form action={createPost} className="space-y-6">
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300" htmlFor="title">
@@ -77,12 +89,24 @@ export default function AddPostPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              className="inline-flex items-center justify-center rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-100"
-            >
-              Add Post
-            </button>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button
+                type="submit"
+                name="published"
+                value="true"
+                className="inline-flex items-center justify-center rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-100"
+              >
+                Publish Post
+              </button>
+              <button
+                type="submit"
+                name="published"
+                value="false"
+                className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-950 transition hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-900"
+              >
+                Save as Draft
+              </button>
+            </div>
           </form>
         </section>
       </main>
